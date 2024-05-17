@@ -1,0 +1,77 @@
+CREATE TABLE roles (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    role_name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE permissions (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    permission_name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE users (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE publications (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    subject VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    user_id VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE comments (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    content TEXT NOT NULL,
+    subject VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    publication_id  VARCHAR(255),
+    user_id  VARCHAR(255),
+    FOREIGN KEY (publication_id) REFERENCES publications(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE user_roles (
+    user_id VARCHAR(255) NOT NULL,
+    role_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+CREATE TABLE user_permissions (
+    user_id VARCHAR(255) NOT NULL,
+    permission_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_id, permission_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(id)
+);
+
+CREATE TABLE forum (
+    id VARCHAR(255) PRIMARY KEY UNIQUE,
+    content TEXT NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    user_id VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
