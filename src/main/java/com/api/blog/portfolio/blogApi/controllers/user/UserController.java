@@ -3,7 +3,9 @@ package com.api.blog.portfolio.blogApi.controllers.user;
 import com.api.blog.portfolio.blogApi.controllers.user.dtos.RequestUserAuthenticationDto;
 import com.api.blog.portfolio.blogApi.controllers.user.dtos.RequestUserDto;
 import com.api.blog.portfolio.blogApi.controllers.user.dtos.ResponseUserDto;
+import com.api.blog.portfolio.blogApi.controllers.user.dtos.ResponseUserTokenDto;
 import com.api.blog.portfolio.blogApi.entities.User;
+import com.api.blog.portfolio.blogApi.infra.security.TokenService;
 import com.api.blog.portfolio.blogApi.services.user.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -25,6 +27,9 @@ public class UserController {
     UserService userService;
 
     @Autowired
+    TokenService tokenService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     //ROTA PARA CRIAÇÃO DE UM NOVO USUARIO
@@ -39,7 +44,11 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid RequestUserAuthenticationDto data){
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email() ,data.password());
-        return ResponseEntity.ok().body(emailPassword);
+        var auth = this.authenticationManager.authenticate(emailPassword);
+
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return ResponseEntity.ok().body(new ResponseUserTokenDto(token));
     }
 
 }
