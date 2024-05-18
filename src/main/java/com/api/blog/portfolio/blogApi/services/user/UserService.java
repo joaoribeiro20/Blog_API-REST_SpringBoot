@@ -15,35 +15,36 @@ import java.util.Optional;
 @Service
 public class UserService implements UserDetailsService {
 
+    private final UserRepositorie userRepositorie;
+
     @Autowired
-    UserRepositorie userRepositorie;
+    public UserService(UserRepositorie userRepositorie) {
+        this.userRepositorie = userRepositorie;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepositorie.findByEmail(email);
     }
 
-    public boolean validateExist(String username){
-        Optional existUser = this.userRepositorie.findByUsername(username);
-        System.out.println(existUser);
-        return existUser.isPresent();
+    public boolean userExistsByEmail(String email) {
+        return userRepositorie.existsByEmail(email);
     }
+
     public User createUser(RequestUserDto user) throws Exception {
-        System.out.println(validateExist(user.email()));
-        if (!validateExist(user.email())) {
-            String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
-            System.out.println(encryptedPassword);
-            RequestUserDto newUserDto = new RequestUserDto(user.username(), user.email(), user.name(), encryptedPassword);
-            User newUser = new User(newUserDto);
-            this.saveUser(newUser);
-            return newUser;
-        } else {
+        if (userExistsByEmail(user.email())) {
             throw new Exception("User already exists with email: " + user.email());
         }
+
+        User newUser = new User(user);
+        String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
+        newUser.setPassword(encryptedPassword);
+        userRepositorie.save(newUser);
+
+        return newUser;
     }
-    public void saveUser(User user) throws Exception {
-            this.userRepositorie.save(user);
-    }
+
+
     public void deleteUser(User user){
         this.userRepositorie.delete(user);
     }
