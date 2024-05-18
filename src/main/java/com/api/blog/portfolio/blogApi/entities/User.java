@@ -32,8 +32,8 @@ public class User implements UserDetails {
     private String password;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public User(RequestUserDto data) {
         this.name = data.name();
@@ -43,6 +43,7 @@ public class User implements UserDetails {
         this.createdAt = LocalDateTime.now();
 
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
