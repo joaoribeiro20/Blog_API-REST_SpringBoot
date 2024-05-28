@@ -1,5 +1,6 @@
 package com.api.blog.portfolio.blogApi.controllers.user.dtos;
 
+import com.api.blog.portfolio.blogApi.entities.user.EnumStatusActivationUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
