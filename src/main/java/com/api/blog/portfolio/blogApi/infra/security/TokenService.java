@@ -1,6 +1,6 @@
 package com.api.blog.portfolio.blogApi.infra.security;
 
-import com.api.blog.portfolio.blogApi.entities.User;
+import com.api.blog.portfolio.blogApi.entities.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;

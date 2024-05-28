@@ -28,7 +28,9 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/user/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/user").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/publication/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/publication/feed").permitAll()
                         //.requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
