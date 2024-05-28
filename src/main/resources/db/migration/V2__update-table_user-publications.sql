@@ -1,0 +1,9 @@
+
+
+ALTER TABLE publications DROP COLUMN subject;
+
+ALTER TABLE comments DROP COLUMN subject;
+
+ALTER TABLE users
+ADD COLUMN userActivation ENUM('ACTIVE', 'PENDING', 'INACTIVE') NOT NULL DEFAULT 'PENDING';
+
