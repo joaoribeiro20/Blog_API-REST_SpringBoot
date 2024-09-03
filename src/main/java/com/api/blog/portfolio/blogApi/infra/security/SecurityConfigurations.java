@@ -21,6 +21,9 @@ public class SecurityConfigurations {
     @Autowired
     SecurityFilter securityFilter;
 
+    @Autowired
+    CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -29,11 +32,17 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/user/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/publication/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/activation/{token}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/publication/feed").permitAll()
-                        //.requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/publication/{id}").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/permissions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/roles/assignToUser").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
