@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -18,13 +19,13 @@ public class UserController {
 
     @PostMapping()
     @Transactional
-    public ResponseEntity CreateNewUser(@RequestBody @Valid RequestUserDto user,  UriComponentsBuilder uriBuilder) throws Exception {
+    public ResponseEntity CreateNewUser(@RequestBody @Valid RequestUserDto user,  UriComponentsBuilder uriBuilder) throws Exception{
         User newUser = userService.createUser(user);
         var uri = uriBuilder.path("/user/{id}").buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(uri).body(new ResponseUserDto(newUser));
     }
     @GetMapping()
-    public ResponseEntity getUser(@RequestHeader("Authorization") String authToken) throws Exception {
+    public ResponseEntity getUser(@RequestHeader("Authorization") String authToken) {
         User user = userService.getUserId(authToken);
         return ResponseEntity.ok().body(user);
     }
@@ -43,16 +44,15 @@ public class UserController {
         User result = userService.deleteUser(authToken);
         return ResponseEntity.ok().body(result);
     }
-    @PostMapping("/activation")
-    public ResponseEntity userActivation(@RequestHeader("Authorization") String authToken, @RequestParam(value = "token", required = false, defaultValue = "") String token) throws Exception {
-        if (authToken != null && !authToken.isEmpty()) {
-            userService.userActivation(authToken, "");
-        } else if (token != null && !token.isEmpty()) {
-            userService.userActivation("", token);
+    @GetMapping("/activation/{token}")
+    public ResponseEntity userActivation(@PathVariable String token) throws Exception {
+
+        if (token != null && !token.isEmpty()) {
+            userService.userActivation(token, "");
         } else {
-            // Lógica para tratamento de erro ou retorno adequado
+            return ResponseEntity.ok().body("Error!");
         }
-        return ResponseEntity.ok().body("Ativação da conta do usuario realizada com sucesso!1");
-        // Retorna ResponseEntity adequado (status, corpo etc.)
+        return ResponseEntity.ok().body("Ativação da conta do usuario realizada com sucesso!");
+
     }
 }
