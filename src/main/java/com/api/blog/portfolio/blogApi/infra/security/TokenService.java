@@ -1,20 +1,27 @@
 package com.api.blog.portfolio.blogApi.infra.security;
 
 import com.api.blog.portfolio.blogApi.entities.user.User;
+import com.api.blog.portfolio.blogApi.repositories.user.UserRepositorie;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 @Service
 public class TokenService {
     @Value("${api.security.token.secret")
     private String secret;
+
+
+    @Autowired
+    UserRepositorie userRepositorie;
 
     public String generateToken(User user) {
         try {
@@ -23,6 +30,21 @@ public class TokenService {
                     .withIssuer("auth-api-blog")
                     .withSubject(user.getEmail())
                     .withExpiresAt(generateExpirationDate())
+                    .sign(algorithm);
+            return token;
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Erro ao gerar o token", exception);
+        }
+    }
+
+    public String generateTokenValidateUser(User user) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Date expirationDate = new Date(System.currentTimeMillis() + 15 * 60 * 1000);
+            String token = JWT.create()
+                    .withIssuer("auth-api-blog")
+                    .withSubject(user.getEmail())
+                    .withExpiresAt(expirationDate)
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
@@ -47,6 +69,5 @@ public class TokenService {
             throw new RuntimeException("Token invalido ou expirado", exception);
         }
     }
-
 
 }
