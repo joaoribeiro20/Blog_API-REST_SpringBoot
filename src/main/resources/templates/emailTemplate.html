@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+</head>
+<body>
+<h1 th:text="${title}">Default Title</h1>
+<p>Dear User,</p>
+<a th:href="@{${link}}" th:text="'Click here'">Click here</a>
+<p th:text="${body}">Default Body</p>
+<p>Best regards,<br/>The Team</p>
+</body>
+</html>
