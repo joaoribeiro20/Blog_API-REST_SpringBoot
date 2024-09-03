@@ -7,6 +7,8 @@ import com.api.blog.portfolio.blogApi.controllers.publication.dtos.ResponsePubli
 import com.api.blog.portfolio.blogApi.controllers.publication.dtos.ResponseUpdatePublicationDto;
 import com.api.blog.portfolio.blogApi.entities.Publication;
 import com.api.blog.portfolio.blogApi.entities.user.User;
+import com.api.blog.portfolio.blogApi.infra.exception.genericExceptions.ResourceNotFoundException;
+import com.api.blog.portfolio.blogApi.infra.exception.genericExceptions.UnauthorizedAccessException;
 import com.api.blog.portfolio.blogApi.infra.security.SecurityFilter;
 import com.api.blog.portfolio.blogApi.infra.security.TokenService;
 import com.api.blog.portfolio.blogApi.repositories.publication.PublicationRepositorie;
@@ -23,25 +25,27 @@ public class PublicationService {
     @Autowired
     PublicationRepositorie publicationRepositorie;
     @Autowired
-    UserService userService;
-    @Autowired
     SecurityFilter securityFilter;
 
-    public Publication createNewPublication(RequestPublicationDto data, String token) {
 
+
+    //CRUD
+    public Publication createNewPublication(RequestPublicationDto data, String token) {
         User user = securityFilter.authToken(token);
         Publication publication = new Publication(data, user);
         publicationRepositorie.save(publication);
 
         return publication;
     }
-
-//    public boolean userExistsByEmail(String email) {
-//        return userRepositorie.existsByEmail(email);
-//    }
-
-
-    public Publication Update(RequestUpdatePublicationDto dataUpdate, String token) throws Exception {
+    public Publication viewPublication(String id)  {
+        Optional<Publication> rest = publicationRepositorie.findById(id);
+        if (rest.isPresent()) {
+            return rest.get();
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
+    public Publication Update(RequestUpdatePublicationDto dataUpdate, String token) {
         User user = securityFilter.authToken(token);
 
         // Verificar se a publicação pertence ao usuário autenticado
@@ -50,7 +54,7 @@ public class PublicationService {
                 .findFirst();
 
         if (!rest.isPresent()) {
-            throw new Exception("Publicação nao encontrdada");
+            throw new UnauthorizedAccessException();
         }
         Publication publication = rest.get();
         if (dataUpdate.title() != null && !dataUpdate.title().trim().isEmpty()) {
@@ -68,25 +72,6 @@ public class PublicationService {
         publicationRepositorie.save(publication);
         return publication;
     }
-
-    public List<Publication> feedPublication() {
-        return publicationRepositorie.findAll();
-    }
-
-    public Publication viewPublication(String id) throws Exception {
-        Optional<Publication> rest = publicationRepositorie.findById(id);
-        if (rest.isPresent()) {
-            return rest.get();
-        } else {
-            // Handle the case where the publication is not found
-            throw new Exception("Publication not found for id: " + id);
-        }
-    }
-
-
-    //buscar o usuario que esta fazendo a solicitação atraves do token
-    //verificar se a publicação que ele tatentando excluir é dele
-    //passar a publicação para deletar
     public void delete(String publicationID ,String token) throws Exception {
         User user = securityFilter.authToken(token);
 
@@ -95,8 +80,13 @@ public class PublicationService {
                 .findFirst();
 
         if (!rest.isPresent()) {
-            throw new Exception("Publicação nao encontrdada");
+            throw new UnauthorizedAccessException();
         }
          publicationRepositorie.delete(rest.get());
+    }
+
+    //EXTRAS
+    public List<Publication> feedPublication() {
+        return publicationRepositorie.findAll();
     }
 }

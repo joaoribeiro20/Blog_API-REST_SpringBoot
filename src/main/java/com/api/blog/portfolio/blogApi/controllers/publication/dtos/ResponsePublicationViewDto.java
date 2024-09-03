@@ -1,9 +1,12 @@
 package com.api.blog.portfolio.blogApi.controllers.publication.dtos;
 
+import com.api.blog.portfolio.blogApi.controllers.comment.dtos.ResponseCommentDto;
 import com.api.blog.portfolio.blogApi.controllers.user.dtos.ResponseGenericUserDto;
+import com.api.blog.portfolio.blogApi.entities.Comment;
 import com.api.blog.portfolio.blogApi.entities.Publication;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record ResponsePublicationViewDto(String id,
                                          String title,
@@ -11,7 +14,8 @@ public record ResponsePublicationViewDto(String id,
                                          String url,
                                          String description,
                                          List<String> subjects,
-                                         ResponseGenericUserDto user) {
+                                         ResponseGenericUserDto user,
+                                         List<ResponseCommentDto> comments) {
     public ResponsePublicationViewDto(Publication publication) {
         this(
                 publication.getId(),
@@ -20,7 +24,10 @@ public record ResponsePublicationViewDto(String id,
                 publication.getUrl(),
                 publication.getDescription(),
                 publication.getSubjects(),
-                new ResponseGenericUserDto(publication.getUser())
+                new ResponseGenericUserDto(publication.getUser()),
+                publication.getComments().stream()
+                        .map(ResponseCommentDto::new)
+                        .collect(Collectors.toList())
         );
     }
 }
