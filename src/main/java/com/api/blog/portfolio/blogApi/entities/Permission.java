@@ -1,9 +1,11 @@
 package com.api.blog.portfolio.blogApi.entities;
 
+import com.api.blog.portfolio.blogApi.entities.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity(name = "permissions")
 @Table(name = "permissions")
@@ -25,4 +27,10 @@ public class Permission {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToMany(mappedBy = "permissions")
+    private Set<Role> roles;
+
+    @ManyToMany(mappedBy = "permissions")
+    private Set<User> users;
 }
